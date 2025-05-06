@@ -7,7 +7,6 @@ import com.jfl.shopping_list.repository.ItemRepository;
 import com.jfl.shopping_list.repository.ListRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,12 +51,12 @@ public class ShoppingListController {
                 .orElseThrow( () -> new ResourceNotFoundException("No records found for this id!"));
     }
 /*
-    @PostMapping("/lists")
-    private ResponseEntity<Void> createShoppingList(@RequestBody ShoppingList newListRequest){
+    @PostMapping("/list")
+    private ShoppingList createShoppingList(@RequestBody ShoppingList list){
+        validate_input_parameters(list);
         ShoppingList newList = new ShoppingList();
         ShoppingList savedList = listRepository.save(newList);
-        return ResponseEntity.created().build();
-
+        return savedList;
     }
 
 */
