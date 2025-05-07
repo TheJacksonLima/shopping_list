@@ -1,8 +1,10 @@
 package com.jfl.shopping_list.controller;
 
 import com.jfl.shopping_list.exceptions.ResourceNotFoundException;
+import com.jfl.shopping_list.exceptions.ValidationException;
 import com.jfl.shopping_list.model.Item;
 import com.jfl.shopping_list.model.ShoppingList;
+import com.jfl.shopping_list.model.ShoppingListDTO;
 import com.jfl.shopping_list.repository.ItemRepository;
 import com.jfl.shopping_list.repository.ListRepository;
 import lombok.Data;
@@ -10,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
+import java.time.LocalDate;
 import java.util.Optional;
 
 @RestController
@@ -19,6 +21,8 @@ import java.util.Optional;
 public class ShoppingListController {
     @Autowired
     ItemRepository itemRepository;
+
+    @Autowired
     ListRepository listRepository;
 
     @GetMapping("/items")
@@ -33,7 +37,7 @@ public class ShoppingListController {
 
     public Item findItemById(Long id) {
         return itemRepository.findById(id)
-                .orElseThrow( () -> new ResourceNotFoundException("No records found for this id!"));
+                .orElseThrow( () -> new ResourceNotFoundException("No item found for this id!"));
     }
 
     @GetMapping("/lists")
@@ -50,15 +54,42 @@ public class ShoppingListController {
         return listRepository.findById(id)
                 .orElseThrow( () -> new ResourceNotFoundException("No records found for this id!"));
     }
-/*
+
     @PostMapping("/list")
-    private ShoppingList createShoppingList(@RequestBody ShoppingList list){
+    private ShoppingList createShoppingList(@RequestBody ShoppingListDTO list) throws ResourceNotFoundException,ValidationException{
         validate_input_parameters(list);
-        ShoppingList newList = new ShoppingList();
-        ShoppingList savedList = listRepository.save(newList);
-        return savedList;
+        Item item = findItemById(list.getItemId());
+        ShoppingList newList =  ShoppingList.builder()
+                                            .item(item)
+                                            .purchaseDate(list.getPurchaseDate())
+                                            .creationDate(list.getCreationDate())
+                                            .lastUpdateDate(list.getLastUpdateDate())
+                                            .observation(list.getObservation())
+                                            .quantity(list.getQuantity())
+                                            .build();
+
+        return listRepository.save(newList);
     }
 
-*/
+    private void validate_input_parameters(ShoppingListDTO list) throws ValidationException{
+
+       if(list.getItemId() == null){
+           throw new ValidationException("ItemId field can't be null");
+       }
+
+       if(list.getQuantity() == null){
+            throw new ValidationException("Quantity field can't be null");
+       }
+
+       if(list.getPurchaseDate() == null){
+           list.setPurchaseDate(LocalDate.now());
+       }
+
+       if(list.getLastUpdateDate() == null){
+            list.setLastUpdateDate(LocalDate.now());
+       }
+
+    }
+
 
 }

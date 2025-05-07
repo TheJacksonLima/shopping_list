@@ -1,12 +1,19 @@
 package com.jfl.shopping_list.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "shopping_list")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ShoppingList {
 
     @Id
